@@ -98,7 +98,7 @@ linearRegressionCrossValidationDataMAE = (mean(scores), std(scores))
 #################################################
 
 print("Loading the ML model...")
-model = load_model("../deploy/nci_stock_prediction.pkl")
+model = load_model("nci_stock_prediction.pkl")
 x_test = pickle.load(open("x_test.pkl","rb"))
 y_test = pickle.load(open("y_test.pkl","rb"))
 scaler = pickle.load(open("scaler.pkl","rb"))

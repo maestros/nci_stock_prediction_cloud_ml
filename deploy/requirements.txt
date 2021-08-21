@@ -13,4 +13,3 @@ yfinance
 pandas
 pandas-datareader
 datetime
-math
