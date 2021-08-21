@@ -54,49 +54,6 @@ train_size = int(len(df) * 0.80)
 test_size = len(df) - train_size
 train, test = df.iloc[0:train_size], df.iloc[train_size:len(df)]
 
-##################### RandomForestRegressor check
-from sklearn.datasets import make_classification
-from sklearn.model_selection import train_test_split
-from sklearn.linear_model import LogisticRegression
-from sklearn.metrics import accuracy_score
-from sklearn.ensemble import RandomForestRegressor
-from sklearn.model_selection import RepeatedKFold, cross_val_score
-from numpy import mean, std
-
-X_trainl, X_testl, y_trainl, y_testl = train_test_split(X, y, test_size=0.4, random_state=0)
-model = RandomForestRegressor()
-
-cv = RepeatedKFold(n_splits=10, n_repeats=3, random_state=1)
-n_scores = cross_val_score(model, X_trainl, y_trainl, scoring='neg_mean_absolute_error', cv=cv, n_jobs=-1,
-                           error_score='raise')
-
-RepeatedKFoldMAE = (mean(n_scores), std(n_scores))
-
-################### Linear regressor check
-
-from sklearn import linear_model
-from sklearn import model_selection
-
-train_features, test_features, train_targets, test_targets = model_selection.train_test_split(X_trainl, y_trainl,
-                                                                                              test_size=0.2)
-# Create an instance of a least-square regression algorithm and assess it's accuracy
-# with default hyper-parameter settings
-reg = linear_model.LinearRegression()
-reg = reg.fit(train_features, train_targets)
-
-from sklearn import metrics
-
-# Predict the response for test dataset
-y_pred = reg.predict(test_features)
-meanSquaredErrorTestDataAccuracy = metrics.mean_squared_error(test_targets, y_pred)
-
-from sklearn.model_selection import cross_val_score
-
-lm = linear_model.LinearRegression()
-scores = cross_val_score(lm, X_testl, y_testl, scoring='neg_mean_squared_error', cv=10)
-linearRegressionCrossValidationDataMAE = (mean(scores), std(scores))
-# scores
-
 # Create the training and test data
 
 # Indexing Batches
@@ -210,5 +167,7 @@ print("Serializing the ML model...")
 model.save("../deploy/nci_stock_prediction.pkl")
 pickle.dump(x_test, open("../deploy/x_test.pkl","wb"))
 pickle.dump(y_test, open("../deploy/y_test.pkl","wb"))
+pickle.dump(scaler, open("../deploy/scaler.pkl","wb"))
+pickle.dump(scaler_pred, open("../deploy/scaler_pred.pkl","wb"))
 print("Finished serializing the ML model: ../deploy/nci_stock_prediction.pkl")
 

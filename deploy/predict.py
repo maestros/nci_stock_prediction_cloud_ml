@@ -20,14 +20,90 @@ import json
 from keras.models import load_model
 import pickle
 
+# Importing Training Set
+start_time = time.time()
+###############################
+# Setting the timeframe for the data extraction
+today = date.today()
+date_today = today.strftime("%Y-%m-%d")
+date_start = (dt.datetime.now() - timedelta(days=3000)).strftime("%Y-%m-%d")
+
+# Getting YFinance quotes
+stockname = 'MSFT'
+symbol = 'MSFT'
+df = yf.download(symbol, start=date_start, end=date_today)
+
+# Set the sequence length - this is the timeframe used to make a single prediction
+sequence_length = 10  # = number of neurons in the first layer of the neural network
+
+# Create a quick overview of the dataset
+train_dfs = df.copy()
+
+df = train_dfs.dropna()
+################ Data leak check #######
+
+# # Select target
+y = train_dfs.Close
+
+# # Select predictors
+X = train_dfs.drop(['Close'], axis=1)
+
+y = y.reset_index(drop=True).copy()
+
+train_size = int(len(df) * 0.80)
+test_size = len(df) - train_size
+
+##################### RandomForestRegressor check
+from sklearn.datasets import make_classification
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import accuracy_score
+from sklearn.ensemble import RandomForestRegressor
+from sklearn.model_selection import RepeatedKFold, cross_val_score
+from numpy import mean, std
+
+X_trainl, X_testl, y_trainl, y_testl = train_test_split(X, y, test_size=0.4, random_state=0)
+model = RandomForestRegressor()
+
+cv = RepeatedKFold(n_splits=10, n_repeats=3, random_state=1)
+n_scores = cross_val_score(model, X_trainl, y_trainl, scoring='neg_mean_absolute_error', cv=cv, n_jobs=-1,
+                           error_score='raise')
+
+RepeatedKFoldMAE = (mean(n_scores), std(n_scores))
+
+################### Linear regressor check
+
+from sklearn import linear_model
+from sklearn import model_selection
+
+train_features, test_features, train_targets, test_targets = model_selection.train_test_split(X_trainl, y_trainl,
+                                                                                              test_size=0.2)
+# Create an instance of a least-square regression algorithm and assess it's accuracy
+# with default hyper-parameter settings
+reg = linear_model.LinearRegression()
+reg = reg.fit(train_features, train_targets)
+
+from sklearn import metrics
+
+# Predict the response for test dataset
+y_pred = reg.predict(test_features)
+meanSquaredErrorTestDataAccuracy = metrics.mean_squared_error(test_targets, y_pred)
+
+from sklearn.model_selection import cross_val_score
+
+lm = linear_model.LinearRegression()
+scores = cross_val_score(lm, X_testl, y_testl, scoring='neg_mean_squared_error', cv=10)
+linearRegressionCrossValidationDataMAE = (mean(scores), std(scores))
+
+#################################################
+
 print("Loading the ML model...")
 model = load_model("../deploy/nci_stock_prediction.pkl")
 x_test = pickle.load(open("x_test.pkl","rb"))
 y_test = pickle.load(open("y_test.pkl","rb"))
-
+scaler = pickle.load(open("scaler.pkl","rb"))
+scaler_pred = pickle.load(open("scaler_pred.pkl","rb"))
 print("Loaded the ML model...")
-
-#################################################
 
 # Get the predicted values
 y_pred = model.predict(x_test)
@@ -55,6 +131,8 @@ RSME = str(np.round(mean_squared_error(y_test_unscaled, y_pred_unscaled, squared
 ###############################################
 ### Prediction of the next day price #######
 ###############################################
+# List of Features
+FEATURES = ['High', 'Low', 'Open', 'Close', 'Volume']
 
 df_temp = df[-sequence_length:]
 new_df = df_temp.filter(FEATURES)
