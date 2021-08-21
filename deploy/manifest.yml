@@ -1,9 +1,8 @@
 ---
 applications:
-- name: MLModelAPI
+  - name: MLModelAPI
     random-route: true
-    buildpack: python_buildpack
     command: python predict.py
     memory: 256M
     docker:
-     image: maestros/python-ml-stock-predict-service
+      image: maestros/python-ml-stock-predict-service

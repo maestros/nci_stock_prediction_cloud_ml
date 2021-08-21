@@ -1,15 +1,7 @@
 flask
 numpy
-scipy
-scikit-learn
 keras
 sklearn
-tensorboard
-tensorboard-data-server
-tensorboard-plugin-wit
 tensorflow
-tensorflow-estimator
 yfinance
 pandas
-pandas-datareader
-datetime

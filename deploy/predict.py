@@ -41,7 +41,7 @@ def predict():
     df = yf.download(symbol, start=date_start, end=date_today)
 
     # Set the sequence length - this is the timeframe used to make a single prediction
-    sequence_length = 10  # = number of neurons in the first layer of the neural network
+    sequence_length = 50  # = number of neurons in the first layer of the neural network
 
     # Create a quick overview of the dataset
     train_dfs = df.copy()

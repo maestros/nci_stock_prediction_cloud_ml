@@ -150,7 +150,7 @@ model.compile(optimizer='Adamax', loss='mse')
 ####################################################
 
 # Training the model
-epochs = 1
+epochs = 50
 batch_size = 16
 early_stop = EarlyStopping(monitor='loss', patience=10, verbose=1)
 history = model.fit(x_train, y_train,
