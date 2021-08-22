@@ -1,0 +1,55 @@
+1. Google Lambda implementation
+# Build the docker image
+docker build -t goog .
+
+# Create a ECR repository
+aws ecr create-repository --repository-name goog --image-scanning-configuration scanOnPush=true --region eu-west-1
+
+# Tag the image to match the repository name
+docker tag goog:latest 078684044194.dkr.ecr.eu-west-1.amazonaws.com/goog:latest
+
+# Register docker to ECR
+aws ecr get-login-password --region eu-west-1 | docker login --username AWS --password-stdin 078684044194.dkr.ecr.eu-west-1.amazonaws.com
+
+# Push the image to ECR
+docker push 078684044194.dkr.ecr.eu-west-1.amazonaws.com/goog:latest
+
+078684044194.dkr.ecr.eu-west-1.amazonaws.com/goog
+
+
+2. Apple Lambda implementation
+
+# Build the docker image
+docker build -t aapl .
+
+# Create a ECR repository
+aws ecr create-repository --repository-name aapl --image-scanning-configuration scanOnPush=true --region eu-west-1
+
+# Tag the image to match the repository name
+docker tag aapl:latest 078684044194.dkr.ecr.eu-west-1.amazonaws.com/aapl:latest
+
+# Register docker to ECR
+aws ecr get-login-password --region eu-west-1 | docker login --username AWS --password-stdin 078684044194.dkr.ecr.eu-west-1.amazonaws.com
+
+# Push the image to ECR
+docker push 078684044194.dkr.ecr.eu-west-1.amazonaws.com/aapl:latest
+
+078684044194.dkr.ecr.eu-west-1.amazonaws.com/aapl
+
+3. MSFT Lambda implementation
+# Build the docker image
+docker build -t msft .
+
+# Create a ECR repository
+aws ecr create-repository --repository-name msft --image-scanning-configuration scanOnPush=true --region eu-west-1
+
+# Tag the image to match the repository name
+docker tag msft:latest 078684044194.dkr.ecr.eu-west-1.amazonaws.com/msft:latest
+
+# Register docker to ECR
+aws ecr get-login-password --region eu-west-1 | docker login --username AWS --password-stdin 078684044194.dkr.ecr.eu-west-1.amazonaws.com
+
+# Push the image to ECR
+docker push 078684044194.dkr.ecr.eu-west-1.amazonaws.com/msft:latest
+
+078684044194.dkr.ecr.eu-west-1.amazonaws.com/msft
