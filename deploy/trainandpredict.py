@@ -19,6 +19,7 @@ import datetime as dt
 from tensorflow.keras.optimizers import Adam
 from tensorflow.keras.optimizers import Adamax
 import flask
+from flask import request
 import os
 
 app = flask.Flask(__name__)
@@ -26,6 +27,28 @@ port = int(os.getenv("PORT", 9099))
 
 @app.route('/trainAndPredict', methods=['POST'])
 def trainAndPredict():
+
+    stock_symbol = request.args.get('stock_symbol')
+    if stock_symbol is None:
+        stock_symbol = 'GOOG'
+        
+    sequence_length = request.args.get('sequence_length')
+    if sequence_length is None:
+        sequence_length = 50
+    else:
+        sequence_length = int(sequence_length)
+    
+    epochs = request.args.get('epochs')
+    if epochs is None:
+        epochs = 50
+    else:
+        epochs = int(epochs)
+        
+    print('Parameters:\n')
+    print('stock_symbol: ', stock_symbol)
+    print('sequence_length: ', sequence_length)
+    print('epochs: ', epochs)
+        
     # Importing Training Set
     start_time = time.time()
     ###############################
@@ -35,9 +58,7 @@ def trainAndPredict():
     date_start = (dt.datetime.now() - timedelta(days=3000)).strftime("%Y-%m-%d")
 
     # Getting YFinance quotes
-    stockname = 'MSFT'
-    symbol = 'MSFT'
-    df = yf.download(symbol, start=date_start, end=date_today)
+    df = yf.download(stock_symbol, start=date_start, end=date_today)
 
     # Set the sequence length - this is the timeframe used to make a single prediction
     sequence_length = 10  # = number of neurons in the first layer of the neural network
@@ -104,12 +125,8 @@ def trainAndPredict():
     scores = cross_val_score(lm, X_testl, y_testl, scoring='neg_mean_squared_error', cv=10)
     linearRegressionCrossValidationDataMAE = (mean(scores), std(scores))
     print('Linear regresssion Cross validation data MAE: %.3f (%.3f)' % linearRegressionCrossValidationDataMAE)
-    # scores
-
 
     # Create the training and test data
-
-
     # Indexing Batches
     train_df = train_dfs.sort_values(by=['Date']).copy()
 
@@ -199,15 +216,15 @@ def trainAndPredict():
     model.add(Dense(5))
     model.add(Dense(1))
 
+    print('Compiling the model')
     # Compile the model
     model.compile(optimizer='Adamax', loss='mse')
 
     ####################################################
 
     # Training the model
-    epochs = 50
     batch_size = 16
-    early_stop = EarlyStopping(monitor='loss', patience=10, verbose=1)
+    print('Training the model')
     history = model.fit(x_train, y_train,
                         batch_size=batch_size,
                         epochs=epochs,
@@ -240,6 +257,8 @@ def trainAndPredict():
     ###############################################
     ### Prediction of the next day price #######
     ###############################################
+    print('Predicting the next day price')
+    
     # List of Features
     FEATURES = ['High', 'Low', 'Open', 'Close', 'Volume']
 
@@ -280,7 +299,7 @@ def trainAndPredict():
     "MAE": MAE,
     "MEDAE": MEDAE,
     "RSME": RSME,
-    "stockname": stockname,
+    "stockSymbol": stock_symbol,
     "today": date_today,
     "todayClosingPrice": str(price_today),
     "predictedPrice": str(predicted_price),
