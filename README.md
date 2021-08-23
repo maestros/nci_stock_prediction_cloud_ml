@@ -4,7 +4,7 @@ The repository also contains the Dockerised images of this project. The built im
 https://hub.docker.com/repository/docker/maestros/python-ml-stock-predict-service/
 
 The results of the metrics of this ML model can be found here:
-https://studentncirl-my.sharepoint.com/:x:/g/personal/x18162070_student_ncirl_ie/EUppT7BZE-1IqYuPcyVXaSkBEttlU-M8WpFj4zHeCe2q5Q?e=qmAjzX
+[Results Spreadsheet](https://studentncirl-my.sharepoint.com/:x:/g/personal/x18162070_student_ncirl_ie/EUppT7BZE-1IqYuPcyVXaSkBEttlU-M8WpFj4zHeCe2q5Q?e=qmAjzX)
 
 This is a group project of the NCI students:
 
